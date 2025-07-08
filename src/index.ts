@@ -1,4 +1,14 @@
 import express, { type Request, type Response } from "express";
+import { overrideGuardianSet } from "./overrideGuardianSet";
+
+await overrideGuardianSet(
+  "http://anvil-eth-sepolia:8545",
+  "0x4a8bc80Ed5a4067f1CCf107057b8270E0cC11A78"
+);
+await overrideGuardianSet(
+  "http://anvil-base-sepolia:8545",
+  "0x79A1027a6A159502049F10906D333EC57E95F083"
+);
 
 const app = express();
 app.use(express.json());
