@@ -1,0 +1,15 @@
+name: tilt
+on: pull_request
+env:
+  HUSKY: 0
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@cea33675329b799adccc9526aa5daccc26cd5052 # pinned to v0.0.19 commit
+      - name: install tilt
+        run: curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+      - run: tilt ci
