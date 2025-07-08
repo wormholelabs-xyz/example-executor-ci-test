@@ -1,8 +1,8 @@
 analytics_settings(False)
 update_settings(max_parallel_updates=10)
 
-k8s_yaml("tilt/anvil-base-sepolia.yaml")
-k8s_yaml("tilt/anvil-eth-sepolia.yaml")
+k8s_yaml("k8s/anvil-base-sepolia.yaml")
+k8s_yaml("k8s/anvil-eth-sepolia.yaml")
 
 k8s_resource(
     "anvil-eth-sepolia",
@@ -29,7 +29,7 @@ docker_build(
     ]
 )
 
-k8s_yaml("tilt/executor.yaml")
+k8s_yaml("k8s/executor.yaml")
 k8s_resource(
     "executor",
     port_forwards = [
