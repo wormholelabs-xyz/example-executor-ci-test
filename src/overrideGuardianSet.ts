@@ -16,7 +16,7 @@ import { EVM_PUBLIC_KEY } from "./consts";
 
 export async function overrideGuardianSet(
   anvilRpcUrl: string,
-  coreContractAddress: Hex
+  coreContractAddress: Hex,
 ) {
   const transport = http(anvilRpcUrl);
   const publicClient = createPublicClient({
@@ -39,7 +39,7 @@ export async function overrideGuardianSet(
     encodeAbiParameters(parseAbiParameters("uint32, bytes32"), [
       guardianSetIndex,
       GUARDIAN_SETS_SLOT,
-    ])
+    ]),
   );
   const firstIndexStorageSlot = BigInt(keccak256(addressesStorageSlot));
   await anvilClient.setStorageAt({
@@ -61,7 +61,7 @@ export async function overrideGuardianSet(
   ]);
   console.log(
     `Overrode guardian set ${guardianSetIndex} of ${anvilRpcUrl} contract ${coreContractAddress} to ${guardianSet.keys.join(
-      ", "
-    )}`
+      ", ",
+    )}`,
   );
 }

@@ -49,8 +49,8 @@ export const quoteHandler = async (req: Request, res: Response) => {
       .status(400)
       .send(
         `Unsupported source chain: ${srcChainId}, supported chains: ${enabledChainIds.join(
-          ","
-        )}`
+          ",",
+        )}`,
       );
     return;
   }
@@ -60,8 +60,8 @@ export const quoteHandler = async (req: Request, res: Response) => {
       .status(400)
       .send(
         `Unsupported destination chain: ${dstChainId}, supported chains: ${enabledChainIds.join(
-          ","
-        )}`
+          ",",
+        )}`,
       );
     return;
   }
@@ -87,7 +87,7 @@ export const quoteHandler = async (req: Request, res: Response) => {
         padHex(PAYEE_PUBLIC_KEY, {
           dir: "left",
           size: 32,
-        })
+        }),
       ),
       srcChain: parseInt(srcChainId),
       dstChain: parseInt(dstChainId),
@@ -116,7 +116,7 @@ export const quoteHandler = async (req: Request, res: Response) => {
       res
         .status(400)
         .send(
-          `Request exceeds maxGasLimit: ${gasLimit.toString()} requested, ${dstChain.capabilities.maxGasLimit.toString()} maximum.`
+          `Request exceeds maxGasLimit: ${gasLimit.toString()} requested, ${dstChain.capabilities.maxGasLimit.toString()} maximum.`,
         );
       return;
     }
@@ -125,7 +125,7 @@ export const quoteHandler = async (req: Request, res: Response) => {
       res
         .status(400)
         .send(
-          `Request exceeds maxMsgValue: ${msgValue.toString()} requested, ${dstChain.capabilities.maxMsgValue.toString()} maximum.`
+          `Request exceeds maxMsgValue: ${msgValue.toString()} requested, ${dstChain.capabilities.maxMsgValue.toString()} maximum.`,
         );
       return;
     }
@@ -136,7 +136,7 @@ export const quoteHandler = async (req: Request, res: Response) => {
       msgValue,
       dstChain.gasPriceDecimals,
       srcChain.nativeDecimals,
-      dstChain.nativeDecimals
+      dstChain.nativeDecimals,
     );
   }
   res.status(200).json(response);
