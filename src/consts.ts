@@ -6,5 +6,10 @@ const account = mnemonicToAccount(
   { addressIndex: 9 }
 );
 
+export const PAYEE_PUBLIC_KEY = account.address;
+
 export const EVM_PUBLIC_KEY = account.address;
 export const EVM_PRIVATE_KEY = toHex(account.getHdKey().privateKey || "0x");
+
+export const QUOTER_PUBLIC_KEY = account.address;
+export const QUOTER_PRIVATE_KEY = toHex(account.getHdKey().privateKey || "0x");

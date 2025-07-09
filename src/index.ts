@@ -1,5 +1,12 @@
-import express, { type Request, type Response } from "express";
+import express from "express";
 import { overrideGuardianSet } from "./overrideGuardianSet";
+import { quoteHandler, statusHandler, capabilitiesHandler } from "./api";
+
+// @ts-ignore
+BigInt.prototype.toJSON = function () {
+  // Can also be JSON.rawJSON(this.toString());
+  return this.toString();
+};
 
 await overrideGuardianSet(
   "http://anvil-eth-sepolia:8545",
@@ -11,16 +18,12 @@ await overrideGuardianSet(
 );
 
 const app = express();
+
 app.use(express.json());
-app.post("/v0/quote", async (req: Request, res: Response) => {
-  res.status(500).send();
-});
-app.post("/v0/status/tx", async (req: Request, res: Response) => {
-  res.status(500).send();
-});
-app.get("/v0/capabilities", async (req: Request, res: Response) => {
-  res.status(500).send();
-});
+app.post("/v0/quote", quoteHandler);
+app.post("/v0/status/tx", statusHandler);
+app.get("/v0/capabilities", capabilitiesHandler);
+
 const server = app.listen(3000, () => {
   console.log(`Server is running at http://localhost:3000`);
 });
