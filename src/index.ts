@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { overrideGuardianSet } from "./overrideGuardianSet";
 import { quoteHandler, statusHandler, capabilitiesHandler } from "./api";
 
@@ -19,6 +20,7 @@ await overrideGuardianSet(
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.post("/v0/quote", quoteHandler);
 app.post("/v0/status/tx", statusHandler);
