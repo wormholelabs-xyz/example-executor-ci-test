@@ -12,6 +12,7 @@ import {
 } from "viem";
 import { anvil } from "viem/chains";
 import { CORE_ABI } from "./abis/core";
+import { EVM_PUBLIC_KEY } from "./consts";
 
 export async function overrideGuardianSet(
   anvilRpcUrl: string,
@@ -50,7 +51,7 @@ export async function overrideGuardianSet(
     address: coreContractAddress,
     index: toHex(firstIndexStorageSlot),
     // devnet guardian https://github.com/wormhole-foundation/wormhole/blob/b9d34bef10ec74c345fa4b406559cf44e3d70095/scripts/devnet-consts.json#L323
-    value: padHex("0xbeFA429d57cD18b7F8A4d91A2da9AB4AF05d0FBe", {
+    value: padHex(EVM_PUBLIC_KEY, {
       dir: "left",
       size: 32,
     }),
