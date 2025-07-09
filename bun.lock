@@ -5,6 +5,8 @@
       "name": "example-executor-ci-test",
       "dependencies": {
         "@types/express": "^5.0.3",
+        "@wormhole-foundation/sdk-base": "^2.4.0",
+        "@wormhole-foundation/sdk-definitions": "^2.4.0",
         "express": "^5.1.0",
         "viem": "^2.31.7",
       },
@@ -57,9 +59,15 @@
 
     "@types/serve-static": ["@types/serve-static@1.15.8", "", { "dependencies": { "@types/http-errors": "*", "@types/node": "*", "@types/send": "*" } }, "sha512-roei0UY3LhpOJvjbIP6ZZFngyLKl5dskOtDhxY5THRSpO+ZI+nzJ+m5yUMzGrp89YRa7lvknKkMYjqQFGwA7Sg=="],
 
+    "@wormhole-foundation/sdk-base": ["@wormhole-foundation/sdk-base@2.4.0", "", { "dependencies": { "@scure/base": "^1.1.3", "binary-layout": "^1.0.3" } }, "sha512-8LbhBMeiDgykZSYc3hkV48bUbasYppCTt3CBQltqBGNUO56sr08HLLCde7R1y9/15qmgQv4cijjp0i/0fNu5hA=="],
+
+    "@wormhole-foundation/sdk-definitions": ["@wormhole-foundation/sdk-definitions@2.4.0", "", { "dependencies": { "@noble/curves": "^1.4.0", "@noble/hashes": "^1.3.1", "@wormhole-foundation/sdk-base": "2.4.0" } }, "sha512-Aqx3/XLaBzbt5kt70N0lnVj3acGe/DYN66R4lG7AVv7VvDTSj2PKC0qOdbKgMh+bzFbjKK03fJkpUzl/d6eo+A=="],
+
     "abitype": ["abitype@1.0.8", "", { "peerDependencies": { "typescript": ">=5.0.4", "zod": "^3 >=3.22.0" }, "optionalPeers": ["typescript", "zod"] }, "sha512-ZeiI6h3GnW06uYDLx0etQtX/p8E24UaHHBj57RSjK7YBFe7iuVn07EDpOeP451D06sF27VOz9JJPlIKJmXgkEg=="],
 
     "accepts": ["accepts@2.0.0", "", { "dependencies": { "mime-types": "^3.0.0", "negotiator": "^1.0.0" } }, "sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng=="],
+
+    "binary-layout": ["binary-layout@1.3.0", "", {}, "sha512-jDJ6rLgjjQ9q8NP5eIumdvsegbbMsNplJ7GHMuVnMWi0Qw59o8kIOw+ew4fLAryPL3LgIp5KrjfdAMoSpmpO8w=="],
 
     "body-parser": ["body-parser@2.2.0", "", { "dependencies": { "bytes": "^3.1.2", "content-type": "^1.0.5", "debug": "^4.4.0", "http-errors": "^2.0.0", "iconv-lite": "^0.6.3", "on-finished": "^2.4.1", "qs": "^6.14.0", "raw-body": "^3.0.0", "type-is": "^2.0.0" } }, "sha512-02qvAaxv8tp7fBa/mw1ga98OGm+eCbqzJOKoRt70sLmfEEi+jyBYVTDGfCL/k06/4EMk/z01gCe7HoCH/f2LTg=="],
 

@@ -1,4 +1,4 @@
-// partial ABI from the Wormhole Core contract
+// partial ABI from the Wormhole Core contract's implementation
 // https://etherscan.io/address/0x3c3d457f1522d3540ab3325aa5f1864e34cba9d0#code
 
 export const CORE_ABI = [
@@ -28,6 +28,13 @@ export const CORE_ABI = [
     ],
     name: "LogMessagePublished",
     type: "event",
+  },
+  {
+    inputs: [],
+    name: "chainId",
+    outputs: [{ internalType: "uint16", name: "", type: "uint16" }],
+    stateMutability: "view",
+    type: "function",
   },
   {
     inputs: [],
