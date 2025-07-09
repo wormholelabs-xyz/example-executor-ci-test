@@ -3,7 +3,7 @@ import { mnemonicToAccount } from "viem/accounts";
 
 const account = mnemonicToAccount(
   "test test test test test test test test test test test junk",
-  { addressIndex: 9 }
+  { addressIndex: 9 },
 );
 
 export const PAYEE_PUBLIC_KEY = account.address;

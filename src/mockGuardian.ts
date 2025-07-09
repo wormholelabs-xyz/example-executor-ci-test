@@ -23,7 +23,7 @@ import { EVM_PRIVATE_KEY } from "./consts";
 async function getWormholeMessage(
   rpc: string,
   txHash: Hex,
-  coreContractAddress: Hex
+  coreContractAddress: Hex,
 ): Promise<VAA<"Uint8Array"> | undefined> {
   console.log(`Mocking guardian signatures for ${rpc} ${txHash}`);
   const transport = http(rpc);
@@ -60,12 +60,12 @@ async function getWormholeMessage(
               blockHash: transaction.blockHash,
               includeTransactions: false,
             })
-          ).timestamp
+          ).timestamp,
         ),
         // NOTE: the Wormhole SDK requires this be a known chain, though that is not strictly necessary for our use case.
         emitterChain: toChain(chainId),
         emitterAddress: new UniversalAddress(
-          toBytes(padHex(emitter, { dir: "left", size: 32 }))
+          toBytes(padHex(emitter, { dir: "left", size: 32 })),
         ),
         consistencyLevel: topic.args.consistencyLevel,
         sequence: topic.args.sequence,
@@ -83,7 +83,7 @@ async function getWormholeMessage(
 export async function mockWormhole(
   rpc: string,
   txHash: Hex,
-  coreContractAddress: Hex
+  coreContractAddress: Hex,
 ): Promise<string> {
   const vaa = await getWormholeMessage(rpc, txHash, coreContractAddress);
   if (vaa) {

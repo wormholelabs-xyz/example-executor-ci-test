@@ -22,11 +22,11 @@ export async function signQuote(quote: Quote, privateKey: `0x${string}`) {
 }
 
 export function getTotalGasLimitAndMsgValue(
-  relayInstructionsHex: `0x${string}`
+  relayInstructionsHex: `0x${string}`,
 ) {
   const relayInstructions = deserialize(
     relayInstructionsLayout,
-    fromHex(relayInstructionsHex, "bytes")
+    fromHex(relayInstructionsHex, "bytes"),
   );
 
   return totalGasLimitAndMsgValue(relayInstructions);
@@ -60,44 +60,44 @@ export function estimateQuote(
   msgValue: bigint,
   dstGasPriceDecimals: number,
   srcTokenDecimals: number,
-  dstNativeDecimals: number
+  dstNativeDecimals: number,
 ): bigint {
   const r = 18;
   const srcChainValueForBaseFee = ScaledMath.normalize(
     quote.baseFee,
     SIGNED_QUOTE_DECIMALS,
-    srcTokenDecimals
+    srcTokenDecimals,
   );
 
   const nSrcPrice = ScaledMath.normalize(
     quote.srcPrice,
     SIGNED_QUOTE_DECIMALS,
-    r
+    r,
   );
   const nDstPrice = ScaledMath.normalize(
     quote.dstPrice,
     SIGNED_QUOTE_DECIMALS,
-    r
+    r,
   );
   const scaledConversion = ScaledMath.div(nDstPrice, nSrcPrice, r);
 
   const nGasLimitCost = ScaledMath.normalize(
     gasLimit * quote.dstGasPrice,
     dstGasPriceDecimals,
-    r
+    r,
   );
 
   const srcChainValueForGasLimit = ScaledMath.normalize(
     ScaledMath.mul(nGasLimitCost, scaledConversion, r),
     r,
-    srcTokenDecimals
+    srcTokenDecimals,
   );
 
   const nMsgValue = ScaledMath.normalize(msgValue, dstNativeDecimals, r);
   const srcChainValueForMsgValue = ScaledMath.normalize(
     ScaledMath.mul(nMsgValue, scaledConversion, r),
     r,
-    srcTokenDecimals
+    srcTokenDecimals,
   );
   return (
     srcChainValueForBaseFee +
