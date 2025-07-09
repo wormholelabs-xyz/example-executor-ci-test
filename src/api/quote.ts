@@ -1,6 +1,6 @@
 import { type Request, type Response } from "express";
 import { enabledChains, type ChainConfig } from "../chains";
-import { isHex, padHex, toBytes } from "viem";
+import { createPublicClient, http, isHex, padHex, toBytes } from "viem";
 import type { Quote } from "@wormhole-foundation/sdk-definitions";
 import {
   PAYEE_PUBLIC_KEY,
@@ -12,10 +12,24 @@ import {
   getTotalGasLimitAndMsgValue,
   signQuote,
 } from "../utils";
+import { anvil } from "viem/chains";
 
 function getChainConfig(chainId: string): ChainConfig | undefined {
   const numericId = parseInt(chainId);
   return enabledChains[numericId];
+}
+
+async function getGasPrice(chainConfig: ChainConfig): Promise<bigint> {
+  try {
+    const transport = http(chainConfig.rpc);
+    const client = createPublicClient({
+      chain: anvil,
+      transport,
+    });
+    return await client.getGasPrice();
+  } catch (e) {
+    throw new Error(`unable to determine gas price`);
+  }
 }
 
 export const quoteHandler = async (req: Request, res: Response) => {
@@ -61,8 +75,9 @@ export const quoteHandler = async (req: Request, res: Response) => {
   }
 
   const expiryTime = new Date();
-
   expiryTime.setHours(expiryTime.getHours() + 1);
+
+  const dstGasPrice = await getGasPrice(dstChain);
 
   const quote: Quote = {
     quote: {
@@ -78,7 +93,7 @@ export const quoteHandler = async (req: Request, res: Response) => {
       dstChain: parseInt(dstChainId),
       expiryTime,
       baseFee: 1n,
-      dstGasPrice: 100n,
+      dstGasPrice: dstGasPrice,
       srcPrice: 10000000000n,
       dstPrice: 10000000000n,
     },
