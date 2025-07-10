@@ -198,9 +198,6 @@ async function verifySignedQuote(signedQuote: SignedQuote): Promise<void> {
       `Bad quoterAddress. Expected: ${QUOTER_PUBLIC_KEY}, Received: ${signedQuote.quote.quoterAddress}`,
     );
   }
-  if (!isHex(signedQuote.signature)) {
-    throw new Error(`Bad signature`);
-  }
   const recoveredPublicKey = await recoverAddress({
     hash: keccak256(serialize(quoteLayout, signedQuote)),
     signature: signedQuote.signature,

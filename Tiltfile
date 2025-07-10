@@ -6,16 +6,12 @@ k8s_yaml("k8s/anvil-eth-sepolia.yaml")
 
 k8s_resource(
     "anvil-eth-sepolia",
-    port_forwards = [
-        port_forward(8545, name = "RPC [:8545]"),
-    ],
+    port_forwards = 8545,
     labels = ["anvil"],
 )
 k8s_resource(
     "anvil-base-sepolia",
-    port_forwards = [
-        port_forward(8546, 8545, name = "RPC [:8546]"),
-    ],
+    port_forwards = '8546:8545',
     labels = ["anvil"],
 )
 
@@ -32,9 +28,7 @@ docker_build(
 k8s_yaml("k8s/executor.yaml")
 k8s_resource(
     "executor",
-    port_forwards = [
-        port_forward(3000, name = "Executor [:3000]"),
-    ],
+    port_forwards = 3000,
     resource_deps = ["anvil-eth-sepolia", "anvil-base-sepolia"],
     labels = ["app"],
 )
