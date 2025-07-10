@@ -1,6 +1,6 @@
 import { type Request, type Response } from "express";
-import { enabledChains, type ChainConfig } from "../chains";
-import { createPublicClient, http, isHex, padHex, toBytes } from "viem";
+import { enabledChains } from "../chains";
+import { isHex, padHex, toBytes } from "viem";
 import type { Quote } from "@wormhole-foundation/sdk-definitions";
 import {
   PAYEE_PUBLIC_KEY,
@@ -12,25 +12,7 @@ import {
   getTotalGasLimitAndMsgValue,
   signQuote,
 } from "../utils";
-import { anvil } from "viem/chains";
-
-function getChainConfig(chainId: string): ChainConfig | undefined {
-  const numericId = parseInt(chainId);
-  return enabledChains[numericId];
-}
-
-async function getGasPrice(chainConfig: ChainConfig): Promise<bigint> {
-  try {
-    const transport = http(chainConfig.rpc);
-    const client = createPublicClient({
-      chain: anvil,
-      transport,
-    });
-    return await client.getGasPrice();
-  } catch (e) {
-    throw new Error(`unable to determine gas price`);
-  }
-}
+import { EvmHandler } from "../relay/platform/evm";
 
 export const quoteHandler = async (req: Request, res: Response) => {
   const enabledChainIds = Object.keys(enabledChains);
@@ -66,8 +48,8 @@ export const quoteHandler = async (req: Request, res: Response) => {
     return;
   }
 
-  const srcChain = getChainConfig(srcChainId);
-  const dstChain = getChainConfig(dstChainId);
+  const srcChain = enabledChains[parseInt(srcChainId)];
+  const dstChain = enabledChains[parseInt(dstChainId)];
 
   if (!srcChain || !dstChain) {
     res.status(500).send("Internal error: Invalid chain configuration");
@@ -77,7 +59,7 @@ export const quoteHandler = async (req: Request, res: Response) => {
   const expiryTime = new Date();
   expiryTime.setHours(expiryTime.getHours() + 1);
 
-  const dstGasPrice = await getGasPrice(dstChain);
+  const dstGasPrice = await EvmHandler.getGasPrice(dstChain);
 
   const quote: Quote = {
     quote: {

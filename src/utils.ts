@@ -1,13 +1,15 @@
 import {
   quoteLayout,
   relayInstructionsLayout,
+  UniversalAddress,
   type Quote,
   type RelayInstructions,
 } from "@wormhole-foundation/sdk-definitions";
 import { deserialize, serialize } from "binary-layout";
-import { concat, fromBytes, fromHex, keccak256 } from "viem";
+import { concat, fromBytes, fromHex, keccak256, toHex } from "viem";
 import { sign } from "viem/accounts";
 import { ScaledMath } from "./lib/ScaledMath";
+import { EMPTY_ADDRESS } from "./consts";
 
 const SIGNED_QUOTE_DECIMALS = 10;
 
@@ -52,6 +54,45 @@ function totalGasLimitAndMsgValue(relayInstructions: RelayInstructions): {
     }
   }
   return { gasLimit, msgValue };
+}
+
+export function getTotalMsgValueFromGasInstructions(
+  relayInstructions: RelayInstructions,
+  msgValueLimit: bigint,
+): bigint {
+  let msgValue = 0n;
+  for (const relayInstruction of relayInstructions.requests) {
+    const type = relayInstruction.request.type;
+    if (type === "GasInstruction") {
+      msgValue += relayInstruction.request.msgValue;
+    }
+  }
+  return msgValue > msgValueLimit ? msgValueLimit : msgValue;
+}
+
+export function getFirstDropOffInstruction(
+  relayInstructions: RelayInstructions,
+  gasDropOffLimit: bigint,
+): {
+  dropOff: bigint;
+  recipient: UniversalAddress;
+} {
+  for (const relayInstruction of relayInstructions.requests) {
+    const type = relayInstruction.request.type;
+    if (type === "GasDropOffInstruction") {
+      if (relayInstruction.request.dropOff > gasDropOffLimit) {
+        return {
+          dropOff: gasDropOffLimit,
+          recipient: relayInstruction.request.recipient,
+        };
+      }
+      return relayInstruction.request;
+    }
+  }
+  return {
+    dropOff: 0n,
+    recipient: new UniversalAddress(EMPTY_ADDRESS),
+  };
 }
 
 export function estimateQuote(
