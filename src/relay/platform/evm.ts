@@ -1,4 +1,9 @@
 import {
+  relayInstructionsLayout,
+  type RelayInstructions,
+} from "@wormhole-foundation/sdk-definitions";
+import { deserialize } from "binary-layout";
+import {
   createPublicClient,
   createWalletClient,
   decodeEventLog,
@@ -12,10 +17,13 @@ import {
   toHex,
   trim,
   type Hex,
-  type PublicClient,
-  type TransactionReceipt,
 } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { anvil } from "viem/chains";
+import { RequestForExecutionLogABI } from "../../abis/requestForExecutionLog";
+import { vaaV1ReceiveWithGasDropAbi } from "../../abis/vaaV1ReceiveWithGasDropoffAbi";
 import type { ChainConfig } from "../../chains";
+import { EVM_PRIVATE_KEY } from "../../consts";
 import type { RequestId } from "../../layouts/requestId";
 import type {
   RelayRequestData,
@@ -23,25 +31,10 @@ import type {
   TxInfo,
 } from "../../types";
 import {
-  anvil,
-  type OpStackTransactionReceipt,
-  type ZksyncTransactionReceipt,
-} from "viem/chains";
-import { RequestForExecutionLogABI } from "../../abis/requestForExecutionLog";
-import {
   getFirstDropOffInstruction,
   getTotalGasLimitAndMsgValue,
   getTotalMsgValueFromGasInstructions,
 } from "../../utils";
-import {
-  relayInstructionsLayout,
-  type RelayInstructions,
-} from "@wormhole-foundation/sdk-definitions";
-import { deserialize } from "binary-layout";
-import { EVM_PRIVATE_KEY } from "../../consts";
-import { privateKeyToAccount } from "viem/accounts";
-import { vaaV1ReceiveWithGasDropAbi } from "../../abis/vaaV1ReceiveWithGasDropoffAbi";
-import { mockWormhole } from "../../mockGuardian";
 
 const REQUEST_FOR_EXECUTION_TOPIC = toEventHash(
   "RequestForExecution(address,uint256,uint16,bytes32,address,bytes,bytes,bytes)",
@@ -157,14 +150,8 @@ export class EvmHandler {
   static async relayVAAv1(
     chainConfig: ChainConfig,
     relayRequest: RelayRequestData,
+    base64Vaa: string,
   ): Promise<Array<TxInfo>> {
-    if (
-      !isHex(relayRequest.txHash) ||
-      !isHex(chainConfig.coreContractAddress)
-    ) {
-      throw new Error(`TxHash not hex!`);
-    }
-
     const transport = http(chainConfig.rpc);
     const publicClient = createPublicClient({
       chain: anvil,
@@ -198,12 +185,6 @@ export class EvmHandler {
       chain: chainConfig.viemChain,
       transport,
     });
-
-    const base64Vaa = await mockWormhole(
-      chainConfig.rpc,
-      relayRequest.txHash,
-      chainConfig.coreContractAddress,
-    );
 
     const payloadHex = toHex(Buffer.from(base64Vaa, "base64"));
 

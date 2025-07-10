@@ -1,0 +1,9 @@
+[submodule "evm/lib/forge-std"]
+	path = evm/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "evm/lib/example-messaging-executor"]
+	path = evm/lib/example-messaging-executor
+	url = https://github.com/wormholelabs-xyz/example-messaging-executor
+[submodule "evm/lib/wormhole-solidity-sdk"]
+	path = evm/lib/wormhole-solidity-sdk
+	url = https://github.com/wormhole-foundation/wormhole-solidity-sdk
