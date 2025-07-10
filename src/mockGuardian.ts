@@ -92,5 +92,5 @@ export async function mockWormhole(
     const base64 = Buffer.from(serialize(signedVaa)).toString("base64");
     return base64;
   }
-  return "";
+  throw new Error(`Vaa not found for txHash: ${txHash}.`);
 }
