@@ -21,6 +21,7 @@ class InMemoryRelayRequestQueue {
       try {
         txInfos = await callback(relayData);
       } catch (e: unknown) {
+        console.error(e);
         relayData.status = RelayStatus.Failed;
 
         if (e instanceof UnsupportedRelayRequestError) {

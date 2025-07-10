@@ -87,7 +87,9 @@ export async function mockWormhole(
 ): Promise<string> {
   const vaa = await getWormholeMessage(rpc, txHash, coreContractAddress);
   if (vaa) {
-    const guardianSet = new mocks.MockGuardians(0, [EVM_PRIVATE_KEY]);
+    const guardianSet = new mocks.MockGuardians(0, [
+      EVM_PRIVATE_KEY.substring(2),
+    ]);
     const signedVaa = guardianSet.addSignatures(vaa);
     const base64 = Buffer.from(serialize(signedVaa)).toString("base64");
     return base64;
