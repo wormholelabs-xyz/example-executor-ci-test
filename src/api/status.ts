@@ -49,15 +49,15 @@ export const statusHandler = async (req: Request, res: Response) => {
     const txHash = req.body?.txHash;
 
     if (typeof txHash !== "string" || !txHash) {
-      return res
-        .status(400)
-        .json({ message: "txHash must be a valid string." });
+      res.status(400).json({ message: "txHash must be a valid string." });
+      return;
     }
 
     if (chainId && !isPositiveWholeNumber(chainId)) {
-      return res
+      res
         .status(400)
         .json({ message: "chainId, if defined, must be a number." });
+      return;
     }
 
     if (!enabledChainIds.includes(chainId.toString())) {
@@ -85,6 +85,7 @@ export const statusHandler = async (req: Request, res: Response) => {
 
     if (existentRelayRequestData && existentRelayRequestData.length > 0) {
       res.status(200).json(existentRelayRequestData);
+      return;
     }
 
     const requestsForExecution = await EvmHandler.getRequestsForExecution(
@@ -118,10 +119,12 @@ export const statusHandler = async (req: Request, res: Response) => {
       processRelayRequests,
     );
 
-    return res.status(200).json(relayRequests);
+    res.status(200).json(relayRequests);
+    return;
   } catch (error) {
     console.error("Error handling status request:", error);
     res.status(500).json({ error: "Failed to process request" });
+    return;
   }
 };
 
