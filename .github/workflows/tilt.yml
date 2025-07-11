@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: start minikube
         id: minikube
         uses: medyagh/setup-minikube@cea33675329b799adccc9526aa5daccc26cd5052 # pinned to v0.0.19 commit
