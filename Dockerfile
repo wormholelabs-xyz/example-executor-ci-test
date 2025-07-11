@@ -17,5 +17,5 @@ USER bun
 EXPOSE 3000/tcp
 ENTRYPOINT [ "bun", "start" ]
 
-FROM release as test
+FROM release AS test
 

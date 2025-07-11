@@ -26,5 +26,5 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "exclude": ["evm"]
+  "exclude": ["evm", "src/e2e.test.ts"]
 }
