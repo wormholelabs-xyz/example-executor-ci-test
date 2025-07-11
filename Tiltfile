@@ -25,10 +25,30 @@ docker_build(
     ]
 )
 
+docker_build(
+    ref = "forge",
+    context = "evm",
+    dockerfile = "./evm/Dockerfile",
+    only=["foundry.toml", "lib", "src"]
+)
+docker_build(
+    ref = "e2e",
+    context = ".",
+    dockerfile = "./Dockerfile.e2e",
+    only=[]
+)
+
 k8s_yaml("k8s/executor.yaml")
 k8s_resource(
     "executor",
     port_forwards = 3000,
     resource_deps = ["anvil-eth-sepolia", "anvil-base-sepolia"],
     labels = ["app"],
+)
+
+k8s_yaml("k8s/e2e.yaml")
+k8s_resource(
+    "e2e",
+    resource_deps=["anvil-eth-sepolia", "anvil-base-sepolia", "executor"],
+    labels=["tests"]
 )

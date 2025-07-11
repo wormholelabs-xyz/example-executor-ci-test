@@ -1,0 +1,9 @@
+FROM forge
+
+FROM executor
+
+WORKDIR /usr/src/app
+
+COPY --from=forge /app/out evm/out 
+
+ENTRYPOINT [ "bun", "test" ]

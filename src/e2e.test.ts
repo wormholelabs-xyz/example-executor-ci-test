@@ -1,23 +1,26 @@
-import { mnemonicToAccount } from "viem/accounts";
-import { ANVIL_MNEMONIC } from "./consts";
-import { test } from "bun:test";
+import { serializeLayout } from "@wormhole-foundation/sdk-base";
+import { relayInstructionsLayout } from "@wormhole-foundation/sdk-definitions";
+import axios from "axios";
+import { sleep } from "bun";
+import { expect, test } from "bun:test";
 import {
   createPublicClient,
   createWalletClient,
   getContract,
   http,
+  isHex,
   padHex,
   toHex,
+  type Account,
+  type Chain,
+  type PublicClient,
+  type WalletClient,
 } from "viem";
-import { anvil, sepolia } from "viem/chains";
-import { serializeLayout } from "@wormhole-foundation/sdk-base";
-import {
-  quoteLayout,
-  relayInstructionsLayout,
-  signedQuoteLayout,
-} from "@wormhole-foundation/sdk-definitions";
-import axios from "axios";
-import { deserialize } from "binary-layout";
+import { mnemonicToAccount } from "viem/accounts";
+import forgeOutput from "../evm/out/ExecutorVAAv1Integration.sol/ExecutorVAAv1Integration.json";
+import { enabledChains } from "./chains";
+import { ANVIL_MNEMONIC } from "./consts";
+import { RelayStatus } from "./types";
 
 const ABI = [
   {
@@ -113,7 +116,90 @@ const ABI = [
   },
 ] as const;
 
+async function deployIntegrationContract(
+  publicClient: PublicClient,
+  client: WalletClient,
+  account: Account,
+  viemChain: Chain,
+  coreContractAddress: string,
+  executorAddress: string,
+) {
+  if (!isHex(forgeOutput.bytecode.object)) {
+    throw new Error("invalid bytecode");
+  }
+  if (!isHex(coreContractAddress)) {
+    throw new Error("invalid coreContractAddress");
+  }
+  if (!isHex(executorAddress)) {
+    throw new Error("invalid executorAddress");
+  }
+  const hash = await client.deployContract({
+    account,
+    chain: viemChain,
+    abi: ABI,
+    bytecode: forgeOutput.bytecode.object,
+    args: [coreContractAddress, executorAddress, 200],
+  });
+  const receipt = await publicClient.waitForTransactionReceipt({
+    hash,
+  });
+  if (!isHex(receipt.contractAddress)) {
+    throw new Error("invalid contractAddress");
+  }
+  return receipt.contractAddress;
+}
+
 test("it performs a VAA v1 relay", async () => {
+  const srcChain = enabledChains[10002]!;
+  const dstChain = enabledChains[10004]!;
+  const account = mnemonicToAccount(ANVIL_MNEMONIC, { addressIndex: 0 });
+  if (!srcChain.viemChain || !dstChain.viemChain) {
+    throw new Error("invalid viem chain");
+  }
+  const srcTransport = http(srcChain.rpc);
+  const srcPublicClient = createPublicClient({
+    chain: srcChain.viemChain,
+    transport: srcTransport,
+  });
+  const srcClient = createWalletClient({
+    account,
+    chain: srcChain.viemChain,
+    transport: srcTransport,
+  });
+  const dstTransport = http(dstChain.rpc);
+  const dstPublicClient = createPublicClient({
+    chain: dstChain.viemChain,
+    transport: dstTransport,
+  });
+  const dstClient = createWalletClient({
+    account,
+    chain: dstChain.viemChain,
+    transport: dstTransport,
+  });
+  const srcContract = await deployIntegrationContract(
+    srcPublicClient,
+    srcClient,
+    account,
+    srcChain.viemChain,
+    srcChain.coreContractAddress,
+    srcChain.executorAddress,
+  );
+  console.log(`Deployed source contract: ${srcContract}`);
+  const dstContract = await deployIntegrationContract(
+    dstPublicClient,
+    dstClient,
+    account,
+    dstChain.viemChain,
+    dstChain.coreContractAddress,
+    dstChain.executorAddress,
+  );
+  console.log(`Deployed destination contract: ${dstContract}`);
+  const dstTestContract = getContract({
+    address: srcContract,
+    abi: ABI,
+    client: srcClient,
+  });
+  expect(await dstTestContract.read.number()).toBe(0n);
   const relayInstructions = toHex(
     serializeLayout(relayInstructionsLayout, {
       requests: [
@@ -127,27 +213,20 @@ test("it performs a VAA v1 relay", async () => {
       ],
     }),
   );
-  const response = await axios.post("http://localhost:3000/v0/quote", {
+  const response = await axios.post("http://executor:3000/v0/quote", {
     srcChain: 10002,
     dstChain: 10004,
     relayInstructions,
   });
-  const transport = http("http://localhost:8545");
-  const account = mnemonicToAccount(ANVIL_MNEMONIC, { addressIndex: 0 });
-  const client = createWalletClient({
-    account,
-    chain: sepolia,
-    transport,
-  });
-  const testContract = getContract({
-    address: "0x8e98Bd10a6f4c1Ee0C4b5d9F50a18D1a7E20EaF8",
+  const srcTestContract = getContract({
+    address: srcContract,
     abi: ABI,
-    client,
+    client: srcClient,
   });
-  const tx = await testContract.write.incrementAndSend(
+  const hash = await srcTestContract.write.incrementAndSend(
     [
       10004,
-      padHex("0x7d77360666066967579a2235332d271587cd62dC", {
+      padHex(dstContract, {
         dir: "left",
         size: 32,
       }),
@@ -160,6 +239,29 @@ test("it performs a VAA v1 relay", async () => {
     { value: BigInt(response.data.estimatedCost) },
   );
   console.log(
-    `https://wormholelabs-xyz.github.io/executor-explorer/#/chain/10002/tx/${tx}?endpoint=http%3A%2F%2Flocalhost%3A3000&env=Testnet`,
+    `Request execution: https://wormholelabs-xyz.github.io/executor-explorer/#/chain/10002/tx/${hash}?endpoint=http%3A%2F%2Flocalhost%3A3000&env=Testnet`,
   );
-});
+  await srcPublicClient.waitForTransactionReceipt({
+    hash,
+  });
+  let statusResult;
+  while (
+    !statusResult ||
+    statusResult.data?.[0].status === RelayStatus.Pending
+  ) {
+    console.log(`Statusing tx: ${hash}`);
+    if (statusResult) {
+      await sleep(1000);
+    }
+    statusResult = await axios.post("http://executor:3000/v0/status/tx", {
+      chainId: srcChain.wormholeChainId,
+      txHash: hash,
+    });
+    if (statusResult.data.length !== 1) {
+      throw new Error(`unexpected status result length`);
+    }
+  }
+  expect(statusResult.data?.[0].status).toBe(RelayStatus.Submitted);
+  expect(await srcTestContract.read.number()).toBe(1n);
+  expect(await dstTestContract.read.number()).toBe(1n);
+}, 60000);
