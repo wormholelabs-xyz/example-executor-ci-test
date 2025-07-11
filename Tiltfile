@@ -21,7 +21,7 @@ docker_build(
     dockerfile = "./Dockerfile",
     target="test",
     only=[
-        "package.json", "bun.lock", "src", ".env.test"
+        "package.json", "bun.lock", "src", ".env.test", "chains.example.json"
     ]
 )
 

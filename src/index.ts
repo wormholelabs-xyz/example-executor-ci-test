@@ -2,21 +2,21 @@ import express from "express";
 import cors from "cors";
 import { overrideGuardianSet } from "./overrideGuardianSet";
 import { quoteHandler, statusHandler, capabilitiesHandler } from "./api";
+import { enabledChains } from "./chains";
+import { isHex } from "viem";
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
-  // Can also be JSON.rawJSON(this.toString());
   return this.toString();
 };
 
-await overrideGuardianSet(
-  "http://anvil-eth-sepolia:8545",
-  "0x4a8bc80Ed5a4067f1CCf107057b8270E0cC11A78",
-);
-await overrideGuardianSet(
-  "http://anvil-base-sepolia:8545",
-  "0x79A1027a6A159502049F10906D333EC57E95F083",
-);
+for (const chain of Object.values(enabledChains)) {
+  if (!isHex(chain.coreContractAddress)) {
+    throw new Error(`Invalid hex address for wormhole core contract`);
+  }
+
+  await overrideGuardianSet(chain.rpc, chain.coreContractAddress);
+}
 
 const app = express();
 

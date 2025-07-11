@@ -12,6 +12,9 @@ FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY package.json package.json
 COPY src src
+COPY chains.example.json /config/chains.json
+
+ENV CHAIN_CONFIG_PATH=/config/chains.json
 
 USER bun
 EXPOSE 3000/tcp
