@@ -1,5 +1,6 @@
 import type { SignedQuote } from "@wormhole-foundation/sdk-definitions";
 import type { RequestLayout } from "./layouts/request";
+import type { RequestId } from "./layouts/requestId";
 
 export enum RequestPrefix {
   ERM1 = "ERM1", // MM
@@ -14,6 +15,10 @@ export type Capabilities = {
   gasDropOffLimit: bigint;
   maxGasLimit: bigint;
   maxMsgValue: bigint;
+};
+
+export type RequestForExecutionWithId = RequestForExecution & {
+  id: RequestId;
 };
 
 export type RequestForExecution = {
