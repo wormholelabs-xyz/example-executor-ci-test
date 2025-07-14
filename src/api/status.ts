@@ -1,14 +1,12 @@
 import { type Request, type Response } from "express";
 import { messageQueue } from "../relay/queue";
-import {
-  EvmHandler,
-  type RequestForExecutionWithId,
-} from "../relay/platform/evm";
+import { evmHandler } from "../relay/evm";
 import { enabledChains, type ChainConfig } from "../chains";
 import {
   RelayStatus,
   type Capabilities,
   type RelayRequestData,
+  type RequestForExecutionWithId,
 } from "../types";
 import {
   fromHex,
@@ -88,7 +86,7 @@ export const statusHandler = async (req: Request, res: Response) => {
       return;
     }
 
-    const requestsForExecution = await EvmHandler.getRequestsForExecution(
+    const requestsForExecution = await evmHandler.getRequestsForExecution(
       txHash,
       chainConfig,
     );

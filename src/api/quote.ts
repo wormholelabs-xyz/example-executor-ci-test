@@ -12,7 +12,7 @@ import {
   getTotalGasLimitAndMsgValue,
   signQuote,
 } from "../utils";
-import { EvmHandler } from "../relay/platform/evm";
+import { evmHandler } from "../relay/evm";
 
 export const quoteHandler = async (req: Request, res: Response) => {
   const enabledChainIds = Object.keys(enabledChains);
@@ -59,7 +59,7 @@ export const quoteHandler = async (req: Request, res: Response) => {
   const expiryTime = new Date();
   expiryTime.setHours(expiryTime.getHours() + 1);
 
-  const dstGasPrice = await EvmHandler.getGasPrice(dstChain);
+  const dstGasPrice = await evmHandler.getGasPrice(dstChain);
 
   const quote: Quote = {
     quote: {

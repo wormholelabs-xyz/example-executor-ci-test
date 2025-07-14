@@ -8,7 +8,7 @@ import {
   type RelayRequestData,
   type TxInfo,
 } from "../types";
-import { EvmHandler } from "./platform/evm";
+import { evmHandler } from "./evm";
 
 export const processRelayRequests = async (
   relayRequest: RelayRequestData,
@@ -63,7 +63,7 @@ export const processRelayRequests = async (
         relayRequest.txHash,
         srcChainConfig.coreContractAddress,
       );
-      relayedTransactions = await EvmHandler.relayVAAv1(
+      relayedTransactions = await evmHandler.relayVAAv1(
         dstChainConfig,
         relayRequest,
         base64Vaa,
