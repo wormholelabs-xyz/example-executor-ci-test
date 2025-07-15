@@ -8,22 +8,6 @@ import { fromHex, toHex } from "viem";
 import { RequestPrefix } from "../types";
 import { hexConversion } from "./conversions";
 
-export const modularMessageRequestLayout = [
-  { name: "chain", binary: "uint", size: 2 },
-  { name: "address", binary: "bytes", size: 32, custom: hexConversion },
-  { name: "sequence", binary: "uint", size: 8 },
-  {
-    name: "payload",
-    binary: "bytes",
-    lengthSize: 4,
-    custom: hexConversion,
-  },
-] as const satisfies Layout;
-
-export type ModularMessageRequest = DeriveType<
-  typeof modularMessageRequestLayout
->;
-
 export const vaaV1RequestLayout = [
   { name: "chain", binary: "uint", size: 2 },
   { name: "address", binary: "bytes", size: 32, custom: hexConversion },
@@ -76,7 +60,6 @@ export const requestLayout = [
     idSize: 4,
     idTag: "prefix",
     layouts: [
-      [[0x45524d31, RequestPrefix.ERM1], modularMessageRequestLayout],
       [[0x45525631, RequestPrefix.ERV1], vaaV1RequestLayout],
       [[0x45524e31, RequestPrefix.ERN1], nttV1RequestLayout],
       [[0x45524331, RequestPrefix.ERC1], cctpV1RequestLayout],

@@ -64,16 +64,13 @@ export const processRelayRequests = async (
 
   switch (prefix) {
     case RequestPrefix.ERV1:
-      const vaaIds = await evmHandler.getWormholeVaaIds(
-        srcChainConfig,
-        relayRequest.txHash,
-      );
+      const vaaId = `${request.chain}/${request.address.substring(2)}/${request.sequence.toString()}`;
 
       const payload = await mockWormhole(
-        srcChainConfig,
+        srcChainConfig.rpc,
         relayRequest.txHash,
         srcChainConfig.coreContractAddress,
-        vaaIds[0]!,
+        vaaId,
       );
       if (!payload) {
         throw new Error("No Vaa found for the transaction.");
@@ -97,7 +94,7 @@ export const processRelayRequests = async (
       for (const message of messages) {
         if (message.type === "wormhole") {
           const payload = await mockWormhole(
-            srcChainConfig,
+            srcChainConfig.rpc,
             relayRequest.txHash,
             srcChainConfig.coreContractAddress,
             message.id,
@@ -119,7 +116,6 @@ export const processRelayRequests = async (
       break;
     case RequestPrefix.ERC2:
     case RequestPrefix.ERC1:
-    case RequestPrefix.ERM1:
     default:
       throw new UnsupportedRelayRequestError(
         `Request of type ${prefix} not supported.`,

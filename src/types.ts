@@ -3,7 +3,6 @@ import type { RequestLayout } from "./layouts/request";
 import type { RequestId } from "./layouts/requestId";
 
 export enum RequestPrefix {
-  ERM1 = "ERM1", // MM
   ERV1 = "ERV1", // VAA_V1
   ERN1 = "ERN1", // NTT_V1
   ERC1 = "ERC1", // CCTP_V1

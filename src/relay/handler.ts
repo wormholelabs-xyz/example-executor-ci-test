@@ -18,8 +18,6 @@ export interface IProtocolHandler {
     chainConfig: ChainConfig,
   ): Promise<Array<RequestForExecutionWithId>>;
 
-  getWormholeVaaIds(chainConfig: ChainConfig, txHash: Hex): Promise<string[]>;
-
   relayVAAv1(
     chainConfig: ChainConfig,
     relayRequest: RelayRequestData,
