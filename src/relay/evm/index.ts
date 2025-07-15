@@ -1,10 +1,14 @@
 import {
   createPublicClient,
   decodeEventLog,
+  getContract,
   http,
   isAddressEqual,
   isHex,
+  padHex,
+  parseEventLogs,
   toEventHash,
+  type Hex,
 } from "viem";
 import { anvil } from "viem/chains";
 import { RequestForExecutionLogABI } from "../../abis/requestForExecutionLog";
@@ -12,6 +16,9 @@ import type { ChainConfig } from "../../chains";
 import type { RequestForExecutionWithId } from "../../types";
 import type { IProtocolHandler } from "../handler";
 import { relayVAAv1 } from "./vaav1";
+import { getNttTransferMessages, relayNTTv1 } from "./nttv1";
+import type { VAA } from "@wormhole-foundation/sdk-definitions";
+import { CORE_ABI } from "../../abis/core";
 
 const REQUEST_FOR_EXECUTION_TOPIC = toEventHash(
   "RequestForExecution(address,uint256,uint16,bytes32,address,bytes,bytes,bytes)",
@@ -118,5 +125,45 @@ export const evmHandler: IProtocolHandler = {
     return results;
   },
 
+  getWormholeVaaIds: async (
+    chainConfig: ChainConfig,
+    txHash: Hex,
+  ): Promise<string[]> => {
+    if (!isHex(chainConfig.coreContractAddress)) {
+      throw new Error("Wormhole core contract address invalid, not a Hex");
+    }
+
+    const transport = http(chainConfig.rpc);
+    const client = createPublicClient({
+      chain: anvil,
+      transport,
+    });
+    const transaction = await client.getTransactionReceipt({
+      hash: txHash,
+    });
+
+    const topics = parseEventLogs({
+      eventName: "LogMessagePublished",
+      abi: CORE_ABI,
+      logs: transaction.logs,
+    });
+    const vaaIds: string[] = [];
+
+    for (const topic of topics) {
+      if (
+        topic.removed === false &&
+        isAddressEqual(topic.address, chainConfig.coreContractAddress)
+      ) {
+        const emitter = topic.args.sender;
+        const vaaId = `${chainConfig.wormholeChainId}/${padHex(emitter, { dir: "left", size: 32 }).substring(2)}/${topic.args.sequence.toString()}`;
+        vaaIds.push(vaaId);
+      }
+    }
+
+    return vaaIds;
+  },
+
   relayVAAv1: relayVAAv1,
+  relayNTTv1: relayNTTv1,
+  getNttTransferMessages: getNttTransferMessages,
 };

@@ -6,7 +6,7 @@ import {
   type RelayInstructions,
 } from "@wormhole-foundation/sdk-definitions";
 import { deserialize, serialize } from "binary-layout";
-import { concat, fromBytes, fromHex, keccak256, toHex } from "viem";
+import { concat, fromBytes, fromHex, keccak256 } from "viem";
 import { sign } from "viem/accounts";
 import { ScaledMath } from "./lib/ScaledMath";
 import { EMPTY_ADDRESS } from "./consts";

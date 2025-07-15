@@ -77,3 +77,18 @@ export class UnsupportedRelayRequestError extends Error {
     this.name = "UnsupportedRelayRequestError";
   }
 }
+
+// NttV1
+
+export interface NttTransceiver {
+  address: `0x${string}`;
+  type: string;
+}
+
+export interface NttTransceiverMessageId extends NttTransceiver {
+  id: string;
+}
+
+export interface NttTransceiverPayload extends NttTransceiverMessageId {
+  payload: string;
+}

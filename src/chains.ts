@@ -12,6 +12,7 @@ export interface ChainConfig {
   nativeDecimals: number;
   capabilities: Capabilities;
   coreContractAddress: string;
+  nttMultiReceiveWithGasDropOffAddress: string;
   viemChain?: Chain;
 }
 

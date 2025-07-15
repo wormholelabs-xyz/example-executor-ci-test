@@ -1,14 +1,18 @@
-import { isHex } from "viem";
+import { fromHex, isHex } from "viem";
 import { enabledChains } from "../chains";
 import { mockWormhole } from "../mockGuardian";
 import {
   RelayAbortedError,
   RequestPrefix,
   UnsupportedRelayRequestError,
+  type NttTransceiverPayload,
   type RelayRequestData,
   type TxInfo,
 } from "../types";
 import { evmHandler } from "./evm";
+import { requestIdLayout } from "../layouts/requestId";
+import { deserialize } from "binary-layout";
+import { trimToAddress } from "../layouts/utils";
 
 export const processRelayRequests = async (
   relayRequest: RelayRequestData,
@@ -48,31 +52,74 @@ export const processRelayRequests = async (
     );
   }
 
+  if (!isHex(relayRequest.txHash)) {
+    throw new Error(`TxHash not hex!`);
+  }
+
+  if (!isHex(srcChainConfig.coreContractAddress)) {
+    throw new Error(`Core contract not hex!`);
+  }
+
   let relayedTransactions: Array<TxInfo> = [];
 
   switch (prefix) {
     case RequestPrefix.ERV1:
-      if (!isHex(relayRequest.txHash)) {
-        throw new Error(`TxHash not hex!`);
-      }
-      if (!isHex(srcChainConfig.coreContractAddress)) {
-        throw new Error(`Core contract not hex!`);
-      }
-      const base64Vaa = await mockWormhole(
-        srcChainConfig.rpc,
+      const vaaIds = await evmHandler.getWormholeVaaIds(
+        srcChainConfig,
+        relayRequest.txHash,
+      );
+
+      const payload = await mockWormhole(
+        srcChainConfig,
         relayRequest.txHash,
         srcChainConfig.coreContractAddress,
+        vaaIds[0]!,
       );
+      if (!payload) {
+        throw new Error("No Vaa found for the transaction.");
+      }
+
       relayedTransactions = await evmHandler.relayVAAv1(
         dstChainConfig,
         relayRequest,
-        base64Vaa,
+        payload,
+      );
+      break;
+    case RequestPrefix.ERN1:
+      const messages = await evmHandler.getNttTransferMessages(
+        srcChainConfig,
+        deserialize(requestIdLayout, fromHex(relayRequest.id, "bytes")),
+        trimToAddress(request.srcManager),
+        request.messageId,
+      );
+
+      const messagesWithPayloads: NttTransceiverPayload[] = [];
+      for (const message of messages) {
+        if (message.type === "wormhole") {
+          const payload = await mockWormhole(
+            srcChainConfig,
+            relayRequest.txHash,
+            srcChainConfig.coreContractAddress,
+            message.id,
+          );
+          if (!payload) {
+            throw new Error(
+              `Expected Vaa for id ${message.id} has not been found`,
+            );
+          }
+          messagesWithPayloads.push({ ...message, payload });
+        }
+      }
+
+      relayedTransactions = await evmHandler.relayNTTv1(
+        dstChainConfig,
+        relayRequest,
+        messagesWithPayloads,
       );
       break;
     case RequestPrefix.ERC2:
     case RequestPrefix.ERC1:
     case RequestPrefix.ERM1:
-    case RequestPrefix.ERN1:
     default:
       throw new UnsupportedRelayRequestError(
         `Request of type ${prefix} not supported.`,
