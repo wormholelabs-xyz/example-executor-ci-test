@@ -68,6 +68,16 @@ The following contracts are used as part of this repository infrastructure:
 | Executor                   | Sepolia      | [0xD0fb39f5a3361F21457653cB70F9D0C9bD86B66B](https://sepolia.etherscan.io/address/0xD0fb39f5a3361F21457653cB70F9D0C9bD86B66B) | Main executor contract            |
 | MultiReceiveWithGasDropOff | Base Sepolia | [0xe3cc16Cffa085C78e5D8144C74Fa97e4Fe53d68d](https://sepolia.basescan.org/address/0xe3cc16Cffa085C78e5D8144C74Fa97e4Fe53d68d) | Manages multi-receiver operations |
 
+## Reference Repositories
+
+The following open source repositories provide additional resources and examples:
+
+| Repository          | Description                                   | URL                                                                         |
+| ------------------- | --------------------------------------------- | --------------------------------------------------------------------------- |
+| Executor            | Main messaging executor helper implementation | [GitHub](https://github.com/wormholelabs-xyz/example-messaging-executor)    |
+| Executor Helpers    | Helper utilities for executor integration     | [GitHub](https://github.com/wormholelabs-xyz/executor-helpers)              |
+| NttWithExecutor EVM | NTT integration example for EVM chains        | [GitHub](https://github.com/wormholelabs-xyz/example-ntt-with-executor-evm) |
+
 ## Using the Executor Explorer
 
 You can monitor and explore executor transactions using the Executor Explorer. For local development:
