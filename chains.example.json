@@ -11,8 +11,9 @@
     "nativeDecimals": 18,
     "executorAddress": "0xD0fb39f5a3361F21457653cB70F9D0C9bD86B66B",
     "coreContractAddress": "0x4a8bc80Ed5a4067f1CCf107057b8270E0cC11A78",
+    "nttMultiReceiveWithGasDropOffAddress": "0xe3cc16Cffa085C78e5D8144C74Fa97e4Fe53d68d",
     "capabilities": {
-      "requestPrefixes": ["ERV1"],
+      "requestPrefixes": ["ERV1", "ERN1"],
       "gasDropOffLimit": "100000000000",
       "maxGasLimit": "1000000",
       "maxMsgValue": "200000000000"
@@ -30,8 +31,9 @@
     "nativeDecimals": 18,
     "coreContractAddress": "0x79A1027a6A159502049F10906D333EC57E95F083",
     "executorAddress": "0x51B47D493CBA7aB97e3F8F163D6Ce07592CE4482",
+    "nttMultiReceiveWithGasDropOffAddress": "0xe3cc16Cffa085C78e5D8144C74Fa97e4Fe53d68d",
     "capabilities": {
-      "requestPrefixes": ["ERV1"],
+      "requestPrefixes": ["ERV1", "ERN1"],
       "gasDropOffLimit": "100000000000",
       "maxGasLimit": "1000000",
       "maxMsgValue": "200000000000"
