@@ -1,7 +1,12 @@
 import express from "express";
 import cors from "cors";
 import { overrideGuardianSet } from "./overrideGuardianSet";
-import { quoteHandler, statusHandler, capabilitiesHandler } from "./api";
+import {
+  quoteHandler,
+  statusHandler,
+  capabilitiesHandler,
+  vaasHandler,
+} from "./api";
 import { enabledChains } from "./chains";
 import { isHex } from "viem";
 
@@ -25,6 +30,9 @@ app.use(express.json());
 app.post("/v0/quote", quoteHandler);
 app.post("/v0/status/tx", statusHandler);
 app.get("/v0/capabilities", capabilitiesHandler);
+// This endpoint is part of the Wormholescan API and isn't part of the executor API, but is useful for exposing signed
+// VAAs for clients who wish to not use the Executor for relaying and prefer to relay messages themselves.
+app.get("/api/v1/vaas", vaasHandler);
 
 const server = app.listen(3000, () => {
   console.log(`Server is running at http://localhost:3000`);
