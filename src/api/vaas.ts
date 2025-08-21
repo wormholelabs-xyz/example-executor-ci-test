@@ -1,7 +1,7 @@
 import { enabledChains } from "../chains.ts";
 import { mockWormhole } from "../mockGuardian.ts";
 import { type Request, type Response } from "express";
-import type { Hex } from "viem";
+import { type Hex, isHex } from "viem";
 
 export const vaasHandler = async (req: Request, res: Response) => {
   let txHash = req.query["txHash"];
@@ -11,14 +11,22 @@ export const vaasHandler = async (req: Request, res: Response) => {
     return;
   }
 
+  if (!isHex(txHash)) {
+    res.status(400).send("txHash must be a valid hex string.");
+    return;
+  }
+
   // Loop through enabledChains and try mockWormhole for each one, returning the first signed VAA
   // that mockWormhole returns.
   for (const chainConfig of Object.values(enabledChains)) {
     try {
+      if (!isHex(chainConfig.coreContractAddress)) {
+        continue;
+      }
       const result = await mockWormhole(
         chainConfig.rpc,
-        txHash as Hex,
-        chainConfig.coreContractAddress as Hex,
+        txHash,
+        chainConfig.coreContractAddress,
         "",
       );
 
