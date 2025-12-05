@@ -23,7 +23,6 @@ import {
 } from "viem";
 import { mnemonicToAccount } from "viem/accounts";
 import forgeOutput from "../evm/out/ExecutorVAAv1Integration.sol/ExecutorVAAv1Integration.json";
-import { enabledChains } from "./chains";
 import { ANVIL_MNEMONIC, NTT_TOKEN_BALANCE_STORE } from "./consts";
 import { RelayStatus } from "./types";
 import { anvil } from "viem/chains";
@@ -156,6 +155,7 @@ async function deployIntegrationContract(
 }
 
 test("it performs a VAA v1 relay", async () => {
+  const { enabledChains } = await import("./chains");
   const srcChain = enabledChains[10002]!;
   const dstChain = enabledChains[10004]!;
   const account = mnemonicToAccount(ANVIL_MNEMONIC, { addressIndex: 0 });
@@ -273,6 +273,7 @@ test("it performs a VAA v1 relay", async () => {
 }, 60000);
 
 test("it performs a Ntt v1 relay", async () => {
+  const { enabledChains } = await import("./chains");
   const srcChain = enabledChains[10002]!;
   const dstChain = enabledChains[10004]!;
   const account = mnemonicToAccount(ANVIL_MNEMONIC, { addressIndex: 0 });
