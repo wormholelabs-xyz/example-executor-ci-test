@@ -11,7 +11,10 @@ mock.module("fs", () => ({
   readFileSync: mockReadFileSync,
 }));
 
-afterAll(() => mock.restore());
+afterAll(() => {
+  mock.restore();
+  delete require.cache[require.resolve("./chains")];
+});
 
 describe("Custom Chain Loading", () => {
   beforeEach(() => {
