@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, mock, spyOn } from "bun:test";
+import { afterAll, beforeEach, describe, expect, test, mock, spyOn } from "bun:test";
 import { existsSync, readFileSync } from "fs";
 import { RequestPrefix } from "./types";
 import { chainToChainId } from "@wormhole-foundation/sdk-base";
@@ -10,6 +10,8 @@ mock.module("fs", () => ({
   existsSync: mockExistsSync,
   readFileSync: mockReadFileSync,
 }));
+
+afterAll(() => mock.restore());
 
 describe("Custom Chain Loading", () => {
   beforeEach(() => {
