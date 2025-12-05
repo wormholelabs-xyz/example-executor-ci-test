@@ -32,7 +32,7 @@ export const vaasHandler = async (req: Request, res: Response) => {
 
       if (result !== undefined) {
         res.status(200).json({
-            data: [{ emitterChain: chainConfig.wormholeChainId, vaa: result }]
+          data: [{ emitterChain: chainConfig.wormholeChainId, vaa: result }],
         });
         return;
       }
